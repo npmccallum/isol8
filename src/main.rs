@@ -78,39 +78,4 @@ fn main() {
     //nix::unistd::system("dhclient").unwrap();
 
     nix::unistd::execvp(&argv[0], &argv).unwrap();
-
-    /*for iface in Interface::list().unwrap() {
-        eprintln!("{:?}", iface);
-    }*/
-
-    /*
-
-    let flags = NLM_F_REQUEST;
-    let req = ;
-
-    if let Ok(NetlinkPayload::InnerMessage(RtnlMessage::NewLink(msg))) = nl.request(flags, req) {
-        eprintln!("{:?}", msg.header.index);
-
-        let flags = NLM_F_REQUEST | NLM_F_ACK | NLM_F_EXCL | NLM_F_CREATE;
-        let req = RtnlMessage::NewLink(LinkMessage {
-            nlas: vec![
-                Nla::Link(msg.header.index),
-                Nla::IfName("mvl0".into()),
-                Nla::Info(vec![
-                    Info::Kind(InfoKind::MacVlan),
-                    Info::Data(InfoData::MacVlan(vec![
-                        InfoMacVlan::Mode(MACVLAN_MODE_BRIDGE)
-                    ]))
-                ])
-            ],
-            ..Default::default()
-        });
-
-        if let Ok(NetlinkPayload::Ack(..)) = nl.request(flags, req) {
-            //eprintln!("{:?}", msg);
-            return;
-        }
-    }
-
-    panic!()*/
 }
