@@ -215,18 +215,21 @@ impl Interface {
                 ..Default::default()
             },
             payload: RtnlMessage::NewRoute(RouteMessage {
+                header: RouteHeader {
+                    kind: RTN_UNICAST,
+                    address_family: match address {
+                        IpAddr::V4(..) => AF_INET as u8,
+                        IpAddr::V6(..) => AF_INET6 as u8,
+                    },
+                    ..Default::default()
+                },
                 nlas: vec![
-                    route::Nla::Destination(match address {
-                        IpAddr::V4(..) => vec![0; 4],
-                        IpAddr::V6(..) => vec![0; 16],
-                    }),
                     route::Nla::Gateway(match address {
                         IpAddr::V4(addr) => addr.octets().into(),
                         IpAddr::V6(addr) => addr.octets().into(),
                     }),
                     route::Nla::Oif(self.index),
                 ],
-                ..Default::default()
             })
             .into(),
         })?;
