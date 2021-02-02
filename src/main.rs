@@ -48,9 +48,13 @@ fn main() {
     drop(newns);
 
     let mut ipvlan = Interface::find("ipvl0").expect("unable to find ipvlan");
-    ipvlan.add_address(addr, address.subnet().prefix()).expect("unable to add address");
+    ipvlan
+        .add_address(addr, address.subnet().prefix())
+        .expect("unable to add address");
     ipvlan.up().expect("unable to bring up ipvlan");
-    ipvlan.add_gateway(address.address()).expect("unable to add gatweay to ipvlan");
+    ipvlan
+        .add_gateway(address.address())
+        .expect("unable to add gatweay to ipvlan");
 
     /*nix::sched::unshare(nix::sched::CloneFlags::CLONE_NEWNS).unwrap();
     nix::unistd::chdir("/").unwrap();

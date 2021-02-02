@@ -28,7 +28,7 @@ impl TryFrom<NetlinkPayload<RtnlMessage>> for Interface {
             }
         }
 
-        Err(ErrorKind::InvalidData.into())
+        Err(ErrorKind::InvalidData)
     }
 }
 
@@ -73,21 +73,17 @@ impl Interface {
             match nl.pull()?.payload {
                 NetlinkPayload::Done => break Ok(interfaces),
 
-                NetlinkPayload::InnerMessage(msg) => match msg {
-                    RtnlMessage::NewLink(msg) => {
-                        for nla in msg.nlas {
-                            if let link::nlas::Nla::IfName(alias) = nla {
-                                interfaces.push(Interface {
-                                    index: msg.header.index,
-                                    alias,
-                                });
-                                break;
-                            }
+                NetlinkPayload::InnerMessage(RtnlMessage::NewLink(msg)) => {
+                    for nla in msg.nlas {
+                        if let link::nlas::Nla::IfName(alias) = nla {
+                            interfaces.push(Interface {
+                                index: msg.header.index,
+                                alias,
+                            });
+                            break;
                         }
                     }
-
-                    _ => return Err(ErrorKind::InvalidData.into()),
-                },
+                }
 
                 _ => return Err(ErrorKind::InvalidData.into()),
             }

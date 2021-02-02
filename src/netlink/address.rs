@@ -40,46 +40,42 @@ impl Address {
             match nl.pull()?.payload {
                 NetlinkPayload::Done => break Ok(addresses),
 
-                NetlinkPayload::InnerMessage(msg) => match msg {
-                    RtnlMessage::NewAddress(msg) => {
-                        for nla in msg.nlas {
-                            let (address, subnet) = match nla {
-                                address::Nla::Address(addr) => match msg.header.family.into() {
-                                    AF_INET => {
-                                        let mut bytes = [0u8; 4];
-                                        bytes.copy_from_slice(&addr);
+                NetlinkPayload::InnerMessage(RtnlMessage::NewAddress(msg)) => {
+                    for nla in msg.nlas {
+                        let (address, subnet) = match nla {
+                            address::Nla::Address(addr) => match msg.header.family.into() {
+                                AF_INET => {
+                                    let mut bytes = [0u8; 4];
+                                    bytes.copy_from_slice(&addr);
 
-                                        (
-                                            IpAddr::V4(bytes.into()),
-                                            Subnet::new(bytes.into(), msg.header.prefix_len),
-                                        )
-                                    }
+                                    (
+                                        IpAddr::V4(bytes.into()),
+                                        Subnet::new(bytes.into(), msg.header.prefix_len),
+                                    )
+                                }
 
-                                    AF_INET6 => {
-                                        let mut bytes = [0u8; 16];
-                                        bytes.copy_from_slice(&addr);
+                                AF_INET6 => {
+                                    let mut bytes = [0u8; 16];
+                                    bytes.copy_from_slice(&addr);
 
-                                        (
-                                            IpAddr::V6(bytes.into()),
-                                            Subnet::new(bytes.into(), msg.header.prefix_len),
-                                        )
-                                    }
+                                    (
+                                        IpAddr::V6(bytes.into()),
+                                        Subnet::new(bytes.into(), msg.header.prefix_len),
+                                    )
+                                }
 
-                                    _ => continue,
-                                },
                                 _ => continue,
-                            };
+                            },
+                            _ => continue,
+                        };
 
-                            addresses.push(Address {
-                                index: msg.header.index,
-                                subnet,
-                                address,
-                            })
-                        }
+                        addresses.push(Address {
+                            index: msg.header.index,
+                            subnet,
+                            address,
+                        })
                     }
-
-                    _ => return Err(ErrorKind::InvalidData.into()),
-                },
+                }
 
                 _ => return Err(ErrorKind::InvalidData.into()),
             }
