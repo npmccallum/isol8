@@ -7,7 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-netlink-packet-route = "0.6"
+netlink-packet-route = "0.7"
 netlink-packet-core = "0.2"
-netlink-sys = "0.5"
+netlink-sys = "0.6"
 nix = "0.19"
